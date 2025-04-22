@@ -17,19 +17,19 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 app.use(bodyParser.json());
-// app.use('/uploads', express.static('uploads'));
+app.use('/uploads', express.static('uploads'));
 app.use("/mecw", route);
 
-// const storage = multer.diskStorage({
-//   destination: (req, file, cb) => {
-//     cb(null, 'uploads/');
-//   },
-//   filename: (req, file, cb) => {
-//     cb(null, Date.now() + path.extname(file.originalname));
-//   }
-// });
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'uploads/');
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + path.extname(file.originalname));
+  }
+});
 
-// const upload = multer({ storage });
+const upload = multer({ storage });
 
 // const dbConfig = {
 //   host: 'localhost',
@@ -182,7 +182,7 @@ app.use("/mecw", route);
 // });
 
 app.get("/mecw", (req, res) => {
-  res.send("Ministry of Environment, Climate And Weather Backend running");
+  res.send("Ministry of Environment, Climate And Weather Backend");
 });
 
 const PORT = process.env.PORT || 5000;

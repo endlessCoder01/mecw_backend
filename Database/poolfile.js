@@ -69,3 +69,5 @@ const dbConfig = {
       console.error('Database initialization error:', error);
     }
   })();
+
+  module.exports = pool;

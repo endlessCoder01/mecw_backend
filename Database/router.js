@@ -1,26 +1,30 @@
+const express = require('express');
 const path = require('path');
 const multer = require('multer');
 const pool = require('./poolfile');
 const Router = express.Router();
 const app = express();
+const fs = require("fs");
 
-app.use('/uploads', express.static('uploads'));
-
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-      cb(null, 'uploads/');
-    },
-    filename: (req, file, cb) => {
-      cb(null, Date.now() + path.extname(file.originalname));
+  destination: (req, file, cb) => {
+    const dir = "uploads";
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir);
     }
-  });
+    cb(null, dir);
+  },
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+    cb(null, uniqueSuffix + path.extname(file.originalname));
+  },
+});
   
   const upload = multer({ storage });
   
   
-  
-  // Routes
   Router.post('/api/register', async (req, res) => {
     try {
       const { username, email, password } = req.body;
@@ -29,6 +33,15 @@ const storage = multer.diskStorage({
         [username, email, password]
       );
       res.status(201).json({ id: result.insertId });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  Router.get('/api/users', async (req, res) => {
+    try {
+      const users = await pool.query('SELECT * FROM users');
+      res.json(users);
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
