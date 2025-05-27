@@ -24,6 +24,8 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
+
+///Routes
 Router.post("/api/register", async (req, res) => {
   try {
     const { username, email, password } = req.body;
@@ -117,6 +119,51 @@ Router.get("/api/categories", async (req, res) => {
   try {
     const [categories] = await pool.query("SELECT * FROM categories");
     res.json(categories);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+Router.post("/api/emails", async (req, res) => {
+  try {
+    const { email } = req.body;
+    const [result] = await pool.query(
+      "INSERT INTO news_emails (email) VALUES (?)",
+      [email]
+    );
+    res.status(201).json({ id: result.insertId });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+Router.get("/api/emails", async (req, res) => {
+  try {
+    const [email] = await pool.query("SELECT * FROM news_emails");
+    res.json(email);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+
+Router.post("/api/feedback", async (req, res) => {
+  try {
+    const { name, email, message } = req.body;
+    const [result] = await pool.query(
+      "INSERT INTO feedbacks (name, email, message) VALUES (?,?,?)",
+      [ name, email, message]
+    );
+    res.status(201).json({ id: result.insertId });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+Router.get("/api/feedback", async (req, res) => {
+  try {
+    const [feedbacks] = await pool.query("SELECT * FROM feedbacks");
+    res.json(feedbacks);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
