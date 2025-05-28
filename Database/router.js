@@ -169,4 +169,27 @@ Router.get("/api/feedback", async (req, res) => {
   }
 });
 
+//
+Router.post("/api/donate", async (req, res) => {
+  try {
+    const {name, email, amount, paymentMethod, contactNumber} = req.body;
+    const [result] = await pool.query(
+      "INSERT INTO donations (name, email, amount, payment_type, phone) VALUES (?, ?, ?, ?)",
+      [name, email, amount, paymentMethod, contactNumber]
+    );
+    res.status(201).json({ id: result});
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+Router.get("/api/donate", async (req, res) => {
+  try {
+    const users = await pool.query("SELECT * FROM donations");
+    res.json(users);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 module.exports = Router;
